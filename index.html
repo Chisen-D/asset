@@ -1,146 +1,94 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>資産取り崩しシミュレーション</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        .container { max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; }
-        input, select, button { margin-top: 10px; width: 100%; padding: 8px; }
-        .input-group { text-align: left; margin-bottom: 10px; }
-        .input-group label { display: block; font-weight: bold; }
-        .asset-group { display: flex; gap: 10px; margin-bottom: 10px; }
-        .asset-group input { flex: 1; }
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 20px;
+      }
+      .container {
+        max-width: 500px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+      }
+      input,
+      select,
+      button {
+        margin-top: 10px;
+        width: 100%;
+        padding: 8px;
+      }
+      .input-group {
+        text-align: left;
+        margin-bottom: 10px;
+      }
+      .input-group label {
+        display: block;
+        font-weight: bold;
+      }
+      .asset-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .asset-group input {
+        flex: 1;
+      }
     </style>
-</head>
-<body>
+    <script defer src="script.js"></script>
+  </head>
+  <body>
     <h1>資産取り崩しシミュレーション</h1>
-    
+
     <div class="container">
-        <h2>資産の設定</h2>
-        <div id="assets"></div>
-        <button onclick="addAsset()">資産を追加</button>
-        <button onclick="saveAssets()">保存</button>
-        <button onclick="loadAssets()">読み込み</button>
+      <h2>資産の設定</h2>
+      <div id="assets"></div>
+      <button onclick="addAsset()">資産を追加</button>
+      <button onclick="saveAssets()">保存</button>
+      <button onclick="loadAssets()">読み込み</button>
     </div>
 
     <div class="container">
-        <h2>シミュレーション①: 四半期ごとの取り崩し</h2>
-        <div class="input-group">
-            <label for="currentAsset1">現在の資産:</label>
-            <input type="number" id="currentAsset1" placeholder="現在の資産">
-        </div>
-        <div class="input-group">
-            <label for="baseAsset1">元の基準資産:</label>
-            <input type="number" id="baseAsset1" placeholder="元の基準資産">
-        </div>
-        <button onclick="calculateWithdrawal1()">計算する</button>
-        <p id="result1"></p>
+      <h2>シミュレーション①: 四半期ごとの取り崩し</h2>
+      <div class="input-group">
+        <label for="currentAsset1">現在の資産:</label>
+        <input type="number" id="currentAsset1" placeholder="現在の資産" />
+      </div>
+      <div class="input-group">
+        <label for="baseAsset1">元の基準資産:</label>
+        <input type="number" id="baseAsset1" placeholder="元の基準資産" />
+      </div>
+      <button onclick="calculateWithdrawal1()">計算する</button>
+      <p id="result1"></p>
     </div>
-    
+
     <div class="container">
-        <h2>シミュレーション②: 四半期ごとの取り崩し（月ごと変動あり）</h2>
-        <div class="input-group">
-            <label for="currentAsset2">現在の資産:</label>
-            <input type="number" id="currentAsset2" placeholder="現在の資産">
-        </div>
-        <div class="input-group">
-            <label for="baseAsset2">元の基準資産:</label>
-            <input type="number" id="baseAsset2" placeholder="元の基準資産">
-        </div>
-        <div class="input-group">
-            <label for="month">月を選択:</label>
-            <select id="month">
-                <option value="3">3月</option>
-                <option value="6">6月</option>
-                <option value="9">9月</option>
-                <option value="12">12月</option>
-            </select>
-        </div>
-        <button onclick="calculateWithdrawal2()">計算する</button>
-        <p id="result2"></p>
+      <h2>シミュレーション②: 四半期ごとの取り崩し（月ごと変動あり）</h2>
+      <div class="input-group">
+        <label for="currentAsset2">現在の資産:</label>
+        <input type="number" id="currentAsset2" placeholder="現在の資産" />
+      </div>
+      <div class="input-group">
+        <label for="baseAsset2">元の基準資産:</label>
+        <input type="number" id="baseAsset2" placeholder="元の基準資産" />
+      </div>
+      <div class="input-group">
+        <label for="month">月を選択:</label>
+        <select id="month">
+          <option value="3">3月</option>
+          <option value="6">6月</option>
+          <option value="9">9月</option>
+          <option value="12">12月</option>
+        </select>
+      </div>
+      <button onclick="calculateWithdrawal2()">計算する</button>
+      <p id="result2"></p>
     </div>
-</body>
+  </body>
 </html>
-
-<script>
-function addAsset(name = "", ratio = "") {
-    let assetContainer = document.getElementById("assets");
-    let div = document.createElement("div");
-    div.classList.add("asset-group");
-    div.innerHTML = `
-        <input type="text" placeholder="資産名" class="asset-name" value="${name}">
-        <input type="number" placeholder="割合%" class="asset-ratio" min="0" max="100" value="${ratio}">
-    `;
-    assetContainer.appendChild(div);
-}
-
-function saveAssets() {
-    let assetNames = document.querySelectorAll(".asset-name");
-    let assetRatios = document.querySelectorAll(".asset-ratio");
-    let assets = [];
-    
-    assetNames.forEach((input, index) => {
-        assets.push({ name: input.value, ratio: assetRatios[index].value });
-    });
-    
-    localStorage.setItem("savedAssets", JSON.stringify(assets));
-    alert("資産情報を保存しました。");
-}
-
-function loadAssets() {
-    let assets = JSON.parse(localStorage.getItem("savedAssets")) || [];
-    document.getElementById("assets").innerHTML = "";
-    assets.forEach(asset => addAsset(asset.name, asset.ratio));
-}
-
-function calculateWithdrawal1() {
-    let currentAsset = parseFloat(document.getElementById("currentAsset1").value);
-    let baseAsset = parseFloat(document.getElementById("baseAsset1").value);
-    if (isNaN(currentAsset) || isNaN(baseAsset)) {
-        alert("数値を入力してください。");
-        return;
-    }
-    let withdrawal = (currentAsset - baseAsset) / 4;
-    withdrawal = withdrawal > 0 ? withdrawal : 0;
-    distributeWithdrawal(withdrawal, "result1");
-}
-
-function calculateWithdrawal2() {
-    let currentAsset = parseFloat(document.getElementById("currentAsset2").value);
-    let baseAsset = parseFloat(document.getElementById("baseAsset2").value);
-    let month = parseInt(document.getElementById("month").value);
-    if (isNaN(currentAsset) || isNaN(baseAsset)) {
-        alert("数値を入力してください。");
-        return;
-    }
-    let divisor = month === 3 ? 4 : month === 6 ? 3 : month === 9 ? 2 : 1;
-    let withdrawal = (currentAsset - baseAsset) / divisor;
-    withdrawal = withdrawal > 0 ? withdrawal : 0;
-    distributeWithdrawal(withdrawal, "result2");
-}
-
-function distributeWithdrawal(totalWithdrawal, resultId) {
-    let assetNames = document.querySelectorAll(".asset-name");
-    let assetRatios = document.querySelectorAll(".asset-ratio");
-    let resultText = `総取り崩し額: ${totalWithdrawal.toFixed(2)} 円\n`;
-    
-    let totalRatio = 0;
-    assetRatios.forEach(input => totalRatio += parseFloat(input.value) || 0);
-    
-    if (totalRatio !== 100) {
-        alert("資産割合の合計は100%である必要があります。");
-        return;
-    }
-    
-    assetNames.forEach((input, index) => {
-        let name = input.value || `資産${index + 1}`;
-        let ratio = parseFloat(assetRatios[index].value) / 100;
-        let allocation = totalWithdrawal * ratio;
-        resultText += `${name}: ${allocation.toFixed(2)} 円\n`;
-    });
-    
-    document.getElementById(resultId).innerText = resultText;
-}
-</script>
